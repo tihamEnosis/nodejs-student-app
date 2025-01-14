@@ -35,7 +35,7 @@ app.put('/update/:studentId', contentTypeCheck, paramShouldBeINT, upload.single(
 app.delete('/delete/:studentId', paramShouldBeINT, deleteStudent)
 
 app.all('*', (req, res, next) => {
-    return res.status(404).json('Resource not found')
+    return next({ status: 404, message: 'Resource not found' })
 })
 
 app.use((err, req, res, next) => {
