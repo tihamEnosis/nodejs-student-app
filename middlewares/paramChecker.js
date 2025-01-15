@@ -1,10 +1,10 @@
-const { intChecker } = require("../utils/valueTypeIntCheck");
+const { positiveIntChecker } = require("../utils/valueTypeIntCheck");
 
-const paramShouldBeINT = (req, res, next) => {
-    if (intChecker(req.params.studentId) === false) {
-        return next({ status: 400, message: 'Invalid Id' })
+const paramShouldBePositiveINT = (req, res, next) => {
+    if (!positiveIntChecker(req.params.studentId)) {
+        return next({ status: 400, message: 'Invalid Id provided' });
     }
-    next()
+    next();
 }
 
-module.exports = { paramShouldBeINT }
+module.exports = { paramShouldBePositiveINT };

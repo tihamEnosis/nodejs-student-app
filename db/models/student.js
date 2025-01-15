@@ -4,7 +4,7 @@ const {
   Sequelize
 } = require('sequelize');
 
-const sequelize = require('../../config/sequelize.js')
+const sequelize = require('./sequelize.js');
 
 module.exports = sequelize.define(
   'Student',
@@ -39,10 +39,19 @@ module.exports = sequelize.define(
     },
     modifiedFileName: {
       type: Sequelize.STRING
+    },
+    createdAt: {
+      type: Sequelize.DATE,
+      allowNull: false,
+      defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
+    },
+    updatedAt: {
+      type: Sequelize.DATE,
+      allowNull: false,
+      defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
     }
   },
   {
-    tableName: 'studentTable',
-    timestamps: false
+    tableName: 'students'
   }
-)
+);

@@ -1,7 +1,7 @@
-const Student = require('../db/models/student')
-const { Op } = require("sequelize")
+const Student = require('../db/models/student');
+const { Op } = require("sequelize");
 
-const createStudent = async (req, res) => {
+const createStudent = async (req, res, next) => {
     try {
         const student = await Student.create({
             firstName: req.body.firstName.trim(),
@@ -12,29 +12,28 @@ const createStudent = async (req, res) => {
             initialFileName: req.file.originalname,
             modifiedFileName: req.file.filename
         })
-
-        return res.status(200).json({ file: req.file, student: student })
+        return res.status(200).json({ status: 200, message: 'Created student successfully' });
     } catch (e) {
-        return next({ status: 500, message: "Server Error" })
+        return next({ status: 500, message: "Server Error" });
     }
 }
 
 const retrieveStudents = async (req, res, next) => {
     try {
-        var whereCondition = {}
-        if (req.query.src !== undefined && req.query.src !== '') {
+        var whereCondition = {};
+        if (req.query.searchTerm) {
             whereCondition = {
                 [Op.or]: [
-                    { firstName: { [Op.iLike]: '%' + req.query.src + '%' } },
-                    { lastName: { [Op.iLike]: '%' + req.query.src + '%' } }
+                    { firstName: { [Op.iLike]: '%' + req.query.searchTerm + '%' } },
+                    { lastName: { [Op.iLike]: '%' + req.query.searchTerm + '%' } }
                 ]
             }
         }
 
-        var orderBy = [['id', 'ASC']]
-        if (req.query.srtBy !== undefined && req.query.srt !== undefined && (req.query.srt === 'ASC' || req.query.srt === 'DESC')) {
-            if (req.query.srtBy !== 'firstName' || req.query.srtBy === 'lastName' || req.query.srtBy === 'age')
-                orderBy = [[req.query.srtBy, req.query.srt]]
+        var orderBy = [['id', 'ASC']];
+        if (req.query.sortBy && req.query.sortDirection && (req.query.sortDirection === 'ASC' || req.query.sortDirection === 'DESC')) {
+            if (req.query.sortBy === 'firstName' || req.query.sortBy === 'lastName' || req.query.sortBy === 'age')
+                orderBy = [[req.query.sortBy, req.query.sortDirection]];
         }
 
         const st = await Student.findAll({
@@ -42,21 +41,36 @@ const retrieveStudents = async (req, res, next) => {
             order: orderBy,
             raw: true,
             nest: true,
-        })
+        });
 
-        return res.status(200).json(st)
+        return res.status(200).json(st);
     } catch (e) {
-        return next({ status: 500, message: "Server Error" })
+        return next({ status: 500, message: "Server Error" });
+    }
+}
+
+const retrieveStudent = async (req, res, next) => {
+    try {
+        const id = parseInt(req.params.studentId, 10);
+        const st = await Student.findByPk(id);
+
+        if (!st) {
+            return next({ status: 404, message: 'User does not exist' });
+        }
+
+        return res.status(200).json(st);
+    } catch (e) {
+        return next({ status: 500, message: "Server Error" });
     }
 }
 
 const updateStudent = async (req, res, next) => {
     try {
-        const id = parseInt(req.params.studentId, 10)
+        const id = parseInt(req.params.studentId, 10);
         const st = await Student.findByPk(id);
 
-        if (st === null) {
-            return next({ status: 404, message: 'User does not exist' })
+        if (!st) {
+            return next({ status: 404, message: 'User does not exist' });
         }
 
         const updatedStudent = await Student.update({
@@ -73,31 +87,31 @@ const updateStudent = async (req, res, next) => {
             },
         });
 
-        return res.status(200).json({ file: req.file, up: updatedStudent })
+        return res.status(200).json({ status: 200, message: 'Updated student successfully' });
     } catch (e) {
-        return next({ status: 500, message: "Server Error" })
+        return next({ status: 500, message: "Server Error" });
     }
 }
 
 const deleteStudent = async (req, res, next) => {
     try {
-        const id = parseInt(req.params.studentId, 10)
+        const id = parseInt(req.params.studentId, 10);
         const st = await Student.findByPk(id);
 
-        if (st === null) {
-            return next({ status: 404, message: 'User does not exist' })
+        if (!st) {
+            return next({ status: 404, message: 'User does not exist' });
         }
 
         const deletedStudent = await Student.destroy({
             where: {
                 id: id
             }
-        })
+        });
 
-        return res.status(200).json({ msg: 'deleted', del: deletedStudent })
+        return res.status(200).json({ status: 200, message: 'Deleted student successfully' });
     } catch (e) {
-        return next({ status: 500, message: "Server Error" })
+        return next({ status: 500, message: "Server Error" });
     }
 }
 
-module.exports = { createStudent, retrieveStudents, updateStudent, deleteStudent }
+module.exports = { createStudent, retrieveStudents, retrieveStudent, updateStudent, deleteStudent };

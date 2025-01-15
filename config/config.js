@@ -1,4 +1,5 @@
-require('dotenv').config({ path: `${process.cwd()}/.env` })
+require('dotenv').config({ path: `${process.cwd()}/.env` });
+
 module.exports = {
   development: {
     username: process.env.DB_USERNAME,
@@ -22,4 +23,4 @@ module.exports = {
     host: "127.0.0.1",
     dialect: "mysql"
   }
-}
+};

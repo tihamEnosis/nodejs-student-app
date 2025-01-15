@@ -1,14 +1,14 @@
-const intChecker = (val) => {
-    if (/^\d+$/.test(val) === false) {
-        return false
+const positiveIntChecker = (val) => {
+    if (!/^\d+$/.test(val)) {
+        return false;
     }
-    if (/^0.*/.test(val) === true) {
-        return false
+    if (/^0.*/.test(val)) {
+        return false;
     }
     if (parseInt(val) < 0) {
-        return false
+        return false;
     }
     return true;
-}
+};
 
-module.exports = { intChecker }
+module.exports = { positiveIntChecker };
